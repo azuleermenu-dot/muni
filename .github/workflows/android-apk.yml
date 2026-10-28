@@ -28,7 +28,7 @@ jobs:
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+          token: ${{ secrets.MUNI }}
 
       - name: Build Android APK
         run: eas build --platform android --profile preview --non-interactive
