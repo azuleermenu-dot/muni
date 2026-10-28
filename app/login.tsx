@@ -1,17 +1,30 @@
 import { useState } from 'react';
 import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { requireSupabase } from '@/lib/supabase';
 import { theme } from '@/constants/theme';
 
+const TERMS_VERSION = '1.0';
+const PRIVACY_VERSION = '1.0';
+
 export default function Login() {
+  const params = useLocalSearchParams<{ signup?: string; termsAccepted?: string }>();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [signup, setSignup] = useState(false);
+  const [signup, setSignup] = useState(params.signup === '1');
   const [busy, setBusy] = useState(false);
+  const termsAccepted = params.termsAccepted === '1';
+
+  function startSignup() {
+    router.push('/terms');
+  }
 
   async function submit() {
+    if (signup && !termsAccepted) {
+      Alert.alert('Agreement required', 'Please read and accept the Terms & Agreements and Privacy Policy before creating your MUNI account.');
+      return;
+    }
     if (!email.trim() || password.length < 6 || (signup && !name.trim())) {
       Alert.alert('Check your details', signup ? 'Enter your name, email, and a password of at least 6 characters.' : 'Enter your email and a password of at least 6 characters.');
       return;
@@ -20,7 +33,12 @@ export default function Login() {
     try {
       const supabase = requireSupabase();
       if (signup) {
-        const { data, error } = await supabase.auth.signUp({ email: email.trim(), password });
+        const acceptedAt = new Date().toISOString();
+        const { data, error } = await supabase.auth.signUp({
+          email: email.trim(),
+          password,
+          options: { data: { full_name: name.trim(), terms_version: TERMS_VERSION, privacy_version: PRIVACY_VERSION, terms_accepted_at: acceptedAt } },
+        });
         if (error) throw error;
         if (data.user) {
           const { error: profileError } = await supabase.from('profiles').upsert({
@@ -49,11 +67,13 @@ export default function Login() {
       <Text style={styles.brand}>MUNI</Text>
       <Text style={styles.tagline}>Your school. Your schedule. Your progress.</Text>
       <Text style={styles.title}>{signup ? 'Create your account' : 'Welcome back'}</Text>
+      {signup && <Text style={styles.agreement}>✓ Terms & Agreements accepted • v{TERMS_VERSION}</Text>}
       {signup && <TextInput value={name} onChangeText={setName} placeholder="Full name" placeholderTextColor={theme.muted} style={styles.input} />}
       <TextInput value={email} onChangeText={setEmail} placeholder="Email address" placeholderTextColor={theme.muted} autoCapitalize="none" keyboardType="email-address" style={styles.input} />
       <TextInput value={password} onChangeText={setPassword} placeholder="Password" placeholderTextColor={theme.muted} secureTextEntry style={styles.input} />
       <Pressable disabled={busy} onPress={submit} style={styles.button}>{busy ? <ActivityIndicator color="white" /> : <Text style={styles.buttonText}>{signup ? 'Create account' : 'Sign in'}</Text>}</Pressable>
-      <Pressable onPress={() => setSignup((v) => !v)}><Text style={styles.switch}>{signup ? 'Already have an account? Sign in' : 'New to MUNI? Create an account'}</Text></Pressable>
+      {signup ? <Pressable onPress={() => router.push('/privacy')}><Text style={styles.privacy}>View Privacy Policy</Text></Pressable> : <Pressable onPress={startSignup}><Text style={styles.switch}>New to MUNI? Create an account</Text></Pressable>}
+      {signup && <Pressable onPress={() => setSignup(false)}><Text style={styles.switch}>Already have an account? Sign in</Text></Pressable>}
     </KeyboardAvoidingView>
   );
 }
@@ -64,9 +84,11 @@ const styles = StyleSheet.create({
   logoText: { color: 'white', fontSize: 34, fontWeight: '900' },
   brand: { textAlign: 'center', fontSize: 32, fontWeight: '900', color: theme.ink, marginTop: 12 },
   tagline: { textAlign: 'center', color: theme.muted, marginBottom: 42 },
-  title: { fontSize: 24, fontWeight: '900', color: theme.ink, marginBottom: 16 },
+  title: { fontSize: 24, fontWeight: '900', color: theme.ink, marginBottom: 10 },
+  agreement: { color: theme.accent, fontSize: 12, fontWeight: '800', marginBottom: 12 },
   input: { backgroundColor: theme.card, borderWidth: 1, borderColor: theme.border, borderRadius: 14, padding: 16, fontSize: 16, color: theme.ink, marginBottom: 12 },
   button: { backgroundColor: theme.accent, borderRadius: 14, padding: 17, alignItems: 'center', marginTop: 6 },
   buttonText: { color: 'white', fontSize: 16, fontWeight: '900' },
   switch: { textAlign: 'center', color: theme.accent, fontWeight: '800', marginTop: 20 },
+  privacy: { textAlign: 'center', color: theme.accent, fontWeight: '800', marginTop: 16 },
 });
