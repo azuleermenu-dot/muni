@@ -27,14 +27,11 @@ jobs:
       - name: Install dependencies
         run: npm install --no-package-lock
 
-      - name: Align Expo dependencies
-        run: npx expo install --fix --npm
-
       - name: Verify Expo dependencies
         run: npx expo-doctor
 
       - name: Install EAS CLI
-        run: npm install --global eas-cli@latest
+        run: npm install --global eas-cli@26
 
       - name: Verify Expo configuration
         run: npx expo config --type public
