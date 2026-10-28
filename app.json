@@ -1,14 +1,17 @@
 {
   "expo": {
     "name": "MUNI",
-    "slug": "muni-study-app",
+    "slug": "muni",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "muni",
     "userInterfaceStyle": "automatic",
-    "plugins": ["expo-router"],
-    "ios": {"supportsTablet": true},
-    "android": {"adaptiveIcon": {"backgroundColor": "#F5F7F2"}, "package": "com.minuyan.muni"},
-    "web": {"bundler": "metro"}
+    "description": "Open-source student study planner and review app. Customize it for your school.",
+    "assetBundlePatterns": ["**/*"],
+    "android": {
+      "package": "com.muni.studyapp"
+    },
+    "ios": {
+      "bundleIdentifier": "com.muni.studyapp"
+    }
   }
 }
