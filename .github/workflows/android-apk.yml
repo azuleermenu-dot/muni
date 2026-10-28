@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+
     steps:
       - name: Checkout MUNI
         uses: actions/checkout@v4
@@ -27,15 +28,40 @@ jobs:
       - name: Install EAS CLI
         run: npm install --global eas-cli@latest
 
+      - name: Verify Expo configuration
+        run: npx expo config --type public
+
       - name: Configure EAS project
         env:
           EXPO_TOKEN: ${{ secrets.MUNI }}
-        run: eas init --account azuleermenu --non-interactive
+        run: |
+          if [ -f eas.json ]; then
+            echo "eas.json found"
+          else
+            echo "Missing eas.json"
+            exit 1
+          fi
+          eas project:init --force --non-interactive
 
       - name: Build Android APK
         env:
           EXPO_TOKEN: ${{ secrets.MUNI }}
-        run: eas build --platform android --profile preview --non-interactive
+        run: eas build --platform android --profile preview --non-interactive --wait
+
+      - name: Download APK
+        env:
+          EXPO_TOKEN: ${{ secrets.MUNI }}
+        run: |
+          URL=$(eas build:list --platform android --status finished --limit 1 --json | node -e "let s='';process.stdin.on('data',d=>s+=d);process.stdin.on('end',()=>{const x=JSON.parse(s); console.log(x[0]?.artifacts?.buildUrl||'')})")
+          test -n "$URL"
+          curl -L "$URL" -o MUNI.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MUNI-Android-APK
+          path: MUNI.apk
+          if-no-files-found: error
 
       - name: Build summary
-        run: echo "MUNI Android build submitted. Open the Expo dashboard to download the APK when the build completes."
+        run: echo "MUNI.apk is available in the workflow Artifacts."
