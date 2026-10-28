@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "MUNI",
+    "slug": "muni-study-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "muni",
+    "userInterfaceStyle": "automatic",
+    "plugins": ["expo-router"],
+    "ios": {"supportsTablet": true},
+    "android": {"adaptiveIcon": {"backgroundColor": "#F5F7F2"}, "package": "com.minuyan.muni"},
+    "web": {"bundler": "metro"}
+  }
+}
