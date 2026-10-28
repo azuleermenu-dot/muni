@@ -19,18 +19,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install dependencies
         run: npm install
 
-      - name: Setup Expo and EAS
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.MUNI }}
+      - name: Install EAS CLI
+        run: npm install --global eas-cli@latest
 
       - name: Build Android APK
+        env:
+          EXPO_TOKEN: ${{ secrets.MUNI }}
         run: eas build --platform android --profile preview --non-interactive
 
       - name: Build summary
