@@ -20,12 +20,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
       - name: Install dependencies
         run: npm install
 
       - name: Install EAS CLI
         run: npm install --global eas-cli@latest
+
+      - name: Configure EAS project
+        env:
+          EXPO_TOKEN: ${{ secrets.MUNI }}
+        run: eas init --account azuleermenu --non-interactive
 
       - name: Build Android APK
         env:
