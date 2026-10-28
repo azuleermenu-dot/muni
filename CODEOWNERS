@@ -1,0 +1,7 @@
+# Core app and security-sensitive files require maintainer review.
+* @azuleermenu-dot
+/app/ @azuleermenu-dot
+/lib/ @azuleermenu-dot
+/supabase-schema.sql @azuleermenu-dot
+/package.json @azuleermenu-dot
+/app.json @azuleermenu-dot
