@@ -1,19 +1,54 @@
-# MUNI — Minuyan Unified Learning & Information
+# MUNI — Open Student Study Planner
 
-A mobile student study planner and review app designed for Minuyan National High School.
+**MUNI (Minuyan Unified Learning & Information)** is an open-source mobile study planner and review app for students.
 
-## MVP
-- Student dashboard with study streak, tasks, exams and study time
-- Weekly planner
-- Flashcard practice
-- Quiz practice
-- Local persistence with AsyncStorage
-- Supabase-ready authentication and sync architecture
+The original concept was created for Minuyan National High School, but the codebase is intentionally designed so **any school can copy, customize, self-host, and build its own branded version**.
 
-## Run on Android
-1. Install Node.js.
-2. Run `npm install`.
-3. Run `npx expo start`.
-4. Scan the QR code with Expo Go, or use an Android emulator.
+## What schools can customize
 
-This is a React Native + Expo mobile app, not a website wrapper.
+- School name and logo
+- App name and branding
+- Subjects and grade levels
+- Academic calendar
+- Study schedules
+- Assignment and exam workflows
+- Flashcard/reviewer content
+- Quiz content
+- Colors and visual identity
+
+## Features
+
+- Student dashboard
+- Study planner
+- Assignment tracking
+- Exam tracking
+- Flashcards
+- Practice quizzes
+- Review materials
+- Study progress and streaks
+- Supabase authentication/database integration
+- Mobile-first React Native + Expo architecture
+
+## Tech stack
+
+- React Native
+- Expo
+- TypeScript
+- Supabase
+
+## Create your school's version
+
+1. Fork this repository.
+2. Rename the app in `app.json`.
+3. Replace the school branding and configuration.
+4. Create your own Supabase project.
+5. Apply `supabase-schema.sql` to your database.
+6. Add your environment variables from `.env.example`.
+7. Run the Expo app locally.
+8. Build your Android/iOS app with Expo's build tooling.
+
+No Minuyan-specific student data is included in this repository.
+
+## License
+
+This project is released under the **MIT License**. Schools, students, teachers, developers, and organizations may use, modify, fork, and redistribute the software subject to the license terms.
