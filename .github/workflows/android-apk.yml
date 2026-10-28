@@ -21,9 +21,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: package.json
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --no-package-lock
+
+      - name: Align Expo dependencies
+        run: npx expo install --fix --npm
+
+      - name: Verify Expo dependencies
+        run: npx expo-doctor
 
       - name: Install EAS CLI
         run: npm install --global eas-cli@latest
@@ -34,14 +42,7 @@ jobs:
       - name: Configure EAS project
         env:
           EXPO_TOKEN: ${{ secrets.MUNI }}
-        run: |
-          if [ -f eas.json ]; then
-            echo "eas.json found"
-          else
-            echo "Missing eas.json"
-            exit 1
-          fi
-          eas project:init --force --non-interactive
+        run: eas project:init --account azuleermenu --force --non-interactive
 
       - name: Build Android APK
         env:
@@ -54,7 +55,7 @@ jobs:
         run: |
           URL=$(eas build:list --platform android --status finished --limit 1 --json | node -e "let s='';process.stdin.on('data',d=>s+=d);process.stdin.on('end',()=>{const x=JSON.parse(s); console.log(x[0]?.artifacts?.buildUrl||'')})")
           test -n "$URL"
-          curl -L "$URL" -o MUNI.apk
+          curl -fL "$URL" -o MUNI.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
