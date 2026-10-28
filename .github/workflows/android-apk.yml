@@ -2,16 +2,12 @@ name: Build MUNI Android APK
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - 'v*'
 
 jobs:
-  build-android:
+  build:
     name: Build Android APK
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
+
     steps:
       - name: Checkout MUNI
         uses: actions/checkout@v4
@@ -19,19 +15,20 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install dependencies
         run: npm install
 
-      - name: Setup Expo and EAS
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.MUNI }}
+      - name: Install EAS CLI
+        run: npm install --global eas-cli
 
       - name: Build Android APK
+        env:
+          EXPO_TOKEN: ${{ secrets.MUNI }}
         run: eas build --platform android --profile preview --non-interactive
 
       - name: Build summary
-        run: echo "MUNI Android build submitted. Open the Expo dashboard to download the APK when the build completes."
+        run: |
+          echo "MUNI Android build submitted successfully."
+          echo "Open the EAS build URL printed above to download the APK."
